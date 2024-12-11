@@ -1,13 +1,13 @@
 // backend/routes/api/files.js
 const express = require('express');
 const router = express.Router();
-const auth = require('../../middleware/auth');
+const { auth, strictAuth } = require('../../middleware/auth');
 const fileController = require('../../controllers/fileController');
 const { upload, errorHandler } = require('../../middleware/upload');
 
 // 파일 업로드
 router.post('/upload',
-  auth,
+  strictAuth,
   upload.single('file'),
   errorHandler,
   fileController.uploadFile
@@ -27,7 +27,7 @@ router.get('/view/:filename',
 
 // 파일 삭제
 router.delete('/:id',
-  auth,
+  strictAuth,
   fileController.deleteFile
 );
 

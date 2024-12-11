@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../../middleware/auth');
+const { auth, strictAuth } = require('../../middleware/auth');
 const Room = require('../../models/Room');
 const User = require('../../models/User');
 const { rateLimit } = require('express-rate-limit');
@@ -182,7 +182,7 @@ router.get('/', [limiter, auth], async (req, res) => {
 });
 
 // 채팅방 생성
-router.post('/', auth, async (req, res) => {
+router.post('/', strictAuth, async (req, res) => {
   try {
     const { name, password } = req.body;
     
@@ -261,7 +261,7 @@ router.get('/:roomId', auth, async (req, res) => {
 });
 
 // 채팅방 입장
-router.post('/:roomId/join', auth, async (req, res) => {
+router.post('/:roomId/join', strictAuth, async (req, res) => {
   try {
     const { password } = req.body;
     const room = await Room.findById(req.params.roomId).select('+password');

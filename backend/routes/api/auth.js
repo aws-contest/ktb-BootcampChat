@@ -1,7 +1,7 @@
 // backend/routes/api/auth.js
 const express = require('express');
 const router = express.Router();
-const auth = require('../../middleware/auth');
+const { auth, strictAuth } = require('../../middleware/auth');
 const authController = require('../../controllers/authController');
 
 // 상태 확인 라우트
@@ -24,7 +24,7 @@ router.post('/login', authController.login);
 router.post('/verify-token', authController.verifyToken); // GET /verify-token 라우트 추가
 
 // Protected routes
-router.post('/logout', auth, authController.logout);
-router.post('/refresh-token', auth, authController.refreshToken);
+router.post('/logout', strictAuth, authController.logout);
+router.post('/refresh-token', strictAuth, authController.refreshToken);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../../controllers/userController');
-const auth = require('../../middleware/auth');
+const { auth, strictAuth } = require('../../middleware/auth');
 const { upload } = require('../../middleware/upload');
 
 // 공개 라우트
@@ -17,26 +17,26 @@ router.get('/profile',
 
 // 프로필 업데이트
 router.put('/profile',
-  auth,
+  strictAuth,
   userController.updateProfile
 );
 
 // 프로필 이미지 업로드
 router.post('/profile-image',
-  auth,
+  strictAuth,
   upload.single('profileImage'),
   userController.uploadProfileImage
 );
 
 // 프로필 이미지 삭제
 router.delete('/profile-image',
-  auth,
+  strictAuth,
   userController.deleteProfileImage
 );
 
 // 회원 탈퇴
 router.delete('/account',
-  auth,
+  strictAuth,
   userController.deleteAccount
 );
 
