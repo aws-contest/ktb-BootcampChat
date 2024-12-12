@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@goorm-dev/vapor-core';
-import { 
-  FileText, 
-  Image, 
-  Film, 
-  CheckCheck, 
-  Check, 
-  Music, 
-  ExternalLink, 
+import {
+  FileText,
+  Image,
+  Film,
+  CheckCheck,
+  Check,
+  Music,
+  ExternalLink,
   Download,
-  AlertCircle 
+  AlertCircle
 } from 'lucide-react';
 import { Text, Alert } from '@goorm-dev/vapor-components';
 import PersistentAvatar from '../../common/PersistentAvatar';
@@ -19,9 +19,9 @@ import ReadStatus from '../ReadStatus';
 import fileService from '../../../services/fileService';
 import authService from '../../../services/authService';
 
-const FileMessage = ({ 
-  msg = {}, 
-  isMine = false, 
+const FileMessage = ({
+  msg = {},
+  isMine = false,
   currentUser = null,
   onReactionAdd,
   onReactionRemove,
@@ -91,7 +91,7 @@ const FileMessage = ({
   };
 
   const renderAvatar = () => (
-    <PersistentAvatar 
+    <PersistentAvatar
       user={isMine ? currentUser : msg.sender}
       size="lg"
       className="flex-shrink-0"
@@ -125,7 +125,6 @@ const FileMessage = ({
       document.body.removeChild(link);
 
     } catch (error) {
-      console.error('File download error:', error);
       setError(error.message || '파일 다운로드 중 오류가 발생했습니다.');
     }
   };
@@ -178,7 +177,7 @@ const FileMessage = ({
 
       return (
         <div className="bg-transparent-pattern">
-          <img 
+          <img
             src={previewUrl}
             alt={originalname}
             className="object-cover rounded-sm"
@@ -190,7 +189,7 @@ const FileMessage = ({
                 error: e.error,
                 originalname
               });
-              e.target.onerror = null; 
+              e.target.onerror = null;
               e.target.src = '/images/placeholder-image.png';
               setError('이미지를 불러올 수 없습니다.');
             }}
@@ -199,7 +198,6 @@ const FileMessage = ({
         </div>
       );
     } catch (error) {
-      console.error('Image preview error:', error);
       setError(error.message || '이미지 미리보기를 불러올 수 없습니다.');
       return (
         <div className="flex items-center justify-center h-full bg-gray-100">
@@ -235,9 +233,9 @@ const FileMessage = ({
       </div>
     );
 
-    const previewWrapperClass = 
+    const previewWrapperClass =
       "overflow-hidden";
-    const fileInfoClass = 
+    const fileInfoClass =
       "flex items-center gap-3 p-1 mt-2";
 
     if (mimetype.startsWith('image/')) {
@@ -260,7 +258,7 @@ const FileMessage = ({
         <div className={previewWrapperClass}>
           <div>
             {previewUrl ? (
-              <video 
+              <video
                 className="object-cover rounded-sm"
                 controls
                 preload="metadata"
@@ -299,7 +297,7 @@ const FileMessage = ({
           </div>
           <div className="px-3 pb-3">
             {previewUrl && (
-              <audio 
+              <audio
                 className="w-full"
                 controls
                 preload="metadata"
@@ -341,8 +339,8 @@ const FileMessage = ({
         <div className={`message-bubble ${isMine ? 'message-mine' : 'message-other'} last file-message`}>
           <div className="message-content">
             {error && (
-              <Alert 
-                color="danger" 
+              <Alert
+                color="danger"
                 className="mb-3"
                 onClose={() => setError(null)}
               >
@@ -358,13 +356,13 @@ const FileMessage = ({
             )}
           </div>
           <div className="message-footer">
-            <div 
-              className="message-time mr-3" 
+            <div
+              className="message-time mr-3"
               title={new Date(msg.timestamp).toLocaleString('ko-KR')}
             >
               {formattedTime}
             </div>
-            <ReadStatus 
+            <ReadStatus
               messageType={msg.type}
               participants={room.participants}
               readers={msg.readers}
@@ -375,7 +373,7 @@ const FileMessage = ({
             />
           </div>
         </div>
-        <MessageActions 
+        <MessageActions
           messageId={msg._id}
           messageContent={msg.content}
           reactions={msg.reactions}
@@ -384,7 +382,7 @@ const FileMessage = ({
           onReactionRemove={onReactionRemove}
           isMine={isMine}
           room={room}
-        />        
+        />
       </div>
     </div>
   );

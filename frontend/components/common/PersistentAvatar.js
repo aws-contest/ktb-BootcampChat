@@ -16,9 +16,9 @@ const PersistentAvatar = forwardRef(({
   // getProfileImageUrl 함수 memoization
   const getProfileImageUrl = useCallback((imagePath) => {
     if (!imagePath) return null;
-    return imagePath.startsWith('http') ? 
-      imagePath : 
-      `${process.env.NEXT_PUBLIC_API_URL}${imagePath}`;
+    return imagePath.startsWith('http') ?
+      imagePath :
+      `${process.env.NEXT_PUBLIC_FILE_API_URL}${imagePath}`;
   }, []);
 
   // 프로필 이미지 URL 처리
@@ -108,9 +108,9 @@ const PersistentAvatar = forwardRef(({
           loading="lazy"
         />
       ) : showInitials ? (
-        <span 
-          style={{ 
-            position: 'relative', 
+        <span
+          style={{
+            position: 'relative',
             zIndex: 1,
             fontSize: size === 'sm' ? '0.875rem' : size === 'lg' ? '1.25rem' : '1rem',
             fontWeight: '500'

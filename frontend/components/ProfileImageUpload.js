@@ -14,9 +14,9 @@ const ProfileImageUpload = ({ currentImage, onImageChange }) => {
   // 프로필 이미지 URL 생성
   const getProfileImageUrl = (imagePath) => {
     if (!imagePath) return null;
-    return imagePath.startsWith('http') ? 
-      imagePath : 
-      `${process.env.NEXT_PUBLIC_API_URL}${imagePath}`;
+    return imagePath.startsWith('http') ?
+      imagePath :
+      `${process.env.NEXT_PUBLIC_FILE_API_URL}${imagePath}`;
   };
 
   // 컴포넌트 마운트 시 이미지 설정
@@ -30,12 +30,9 @@ const ProfileImageUpload = ({ currentImage, onImageChange }) => {
     if (!file) return;
 
     try {
-      // 이미지 파일 검증
       if (!file.type.startsWith('image/')) {
         throw new Error('이미지 파일만 업로드할 수 있습니다.');
       }
-
-      // 파일 크기 제한 (5MB)
       if (file.size > 5 * 1024 * 1024) {
         throw new Error('파일 크기는 5MB를 초과할 수 없습니다.');
       }
@@ -71,22 +68,17 @@ const ProfileImageUpload = ({ currentImage, onImageChange }) => {
         const errorData = await response.json();
         throw new Error(errorData.message || '이미지 업로드에 실패했습니다.');
       }
-
       const data = await response.json();
       
-      // 로컬 스토리지의 사용자 정보 업데이트
       const updatedUser = {
         ...user,
         profileImage: data.imageUrl
       };
       localStorage.setItem('user', JSON.stringify(updatedUser));
 
-      // 부모 컴포넌트에 변경 알림
       onImageChange(data.imageUrl);
 
-      // 전역 이벤트 발생
       window.dispatchEvent(new Event('userProfileUpdate'));
-
     } catch (error) {
       console.error('Image upload error:', error);
       setError(error.message);

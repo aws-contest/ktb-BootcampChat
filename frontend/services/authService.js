@@ -55,7 +55,7 @@ const validateCredentials = (credentials) => {
 
 // 재시도 딜레이 계산
 const getRetryDelay = (retryCount) => {
-  const delay = RETRY_CONFIG.baseDelay * 
+  const delay = RETRY_CONFIG.baseDelay *
     Math.pow(RETRY_CONFIG.backoffFactor, retryCount) *
     (1 + Math.random() * 0.1);
   return Math.min(delay, RETRY_CONFIG.maxDelay);
@@ -165,7 +165,6 @@ class AuthService {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      console.log("??????");
       socketService.disconnect();
       localStorage.removeItem('user');
       // 인증 상태 변경 이벤트 발생
@@ -306,7 +305,7 @@ class AuthService {
 
       throw this._handleError(error);
     }
-  }  
+  }
 
   getCurrentUser() {
     try {
@@ -442,7 +441,6 @@ class AuthService {
           return new Error(message || '요청 처리 중 오류가 발생했습니다.');
       }
     }
-
     return error;
   }
 }

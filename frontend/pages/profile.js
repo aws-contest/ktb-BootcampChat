@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { Card } from '@goorm-dev/vapor-core';
-import { 
-  Button, 
-  Input, 
+import {
+  Button,
+  Input,
   Text,
   Alert,
   Label,
@@ -33,11 +33,21 @@ const Profile = () => {
   // 프로필 이미지 URL 생성
   const getProfileImageUrl = useCallback((imagePath) => {
     if (!imagePath) return null;
-    return imagePath.startsWith('http') ? 
-      imagePath : 
-      `${process.env.NEXT_PUBLIC_API_URL}${imagePath}`;
+    return imagePath.startsWith('http') ?
+      imagePath :
+      `${process.env.NEXT_PUBLIC_FILE_API_URL}${imagePath}`;
   }, []);
 
+  const setMessage = (type, message) => {
+    if (type === 'success' ) setSuccess(message);
+    if (type === 'error') setError(message);
+    
+    setTimeout(() => {
+      if(type === 'success') setSuccess('');
+      if(type === 'error') setError('');
+    }, 3000);
+  };
+  
   useEffect(() => {
     const user = authService.getCurrentUser();
     if (!user) {
@@ -45,7 +55,6 @@ const Profile = () => {
       return;
     }
 
-    // 아바타 스타일과 함께 사용자 정보 설정
     if (!avatarStyleRef.current && user.email) {
       const backgroundColor = generateColorFromEmail(user.email);
       const color = getContrastTextColor(backgroundColor);
@@ -55,7 +64,7 @@ const Profile = () => {
     setCurrentUser(user);
     setFormData(prev => ({ ...prev, name: user.name }));
     setProfileImage(user.profileImage || '');
-  }, [router, getProfileImageUrl]);
+  }, [router]);
 
   // 전역 이벤트 리스너 설정
   useEffect(() => {
@@ -66,7 +75,7 @@ const Profile = () => {
         setProfileImage(user.profileImage || '');
       }
     };
-
+    
     window.addEventListener('userProfileUpdate', handleProfileUpdate);
     return () => {
       window.removeEventListener('userProfileUpdate', handleProfileUpdate);
@@ -77,7 +86,7 @@ const Profile = () => {
     try {
       // 이미지 URL 업데이트
       const fullImageUrl = getProfileImageUrl(imageUrl);
-      setProfileImage(imageUrl);
+      setProfileImage(fullImageUrl);
 
       // 현재 사용자 정보 가져오기
       const user = authService.getCurrentUser();
@@ -93,24 +102,14 @@ const Profile = () => {
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setCurrentUser(updatedUser);
 
-      // 성공 메시지 표시
-      setSuccess('프로필 이미지가 업데이트되었습니다.');
-      
-      // 3초 후 성공 메시지 제거
-      setTimeout(() => {
-        setSuccess('');
-      }, 3000);
+      setMessage ('success', '프로필 이미지가 업데이트되었습니다.');
 
       // 전역 이벤트 발생
       window.dispatchEvent(new Event('userProfileUpdate'));
 
     } catch (error) {
       console.error('Image update error:', error);
-      setError('프로필 이미지 업데이트에 실패했습니다.');
-      
-      setTimeout(() => {
-        setError('');
-      }, 3000);
+      setMessage ('error', '프로필 이미지 업데이트에 실패했습니다.');
     }
   }, [getProfileImageUrl]);
 
@@ -145,18 +144,17 @@ const Profile = () => {
       setSuccess('프로필이 성공적으로 업데이트되었습니다.');
 
       // 비밀번호 필드 초기화
-      setFormData(prev => ({ 
-        ...prev, 
-        currentPassword: '', 
-        newPassword: '', 
-        confirmPassword: '' 
+      setFormData(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
       }));
 
       // 전역 이벤트 발생
       window.dispatchEvent(new Event('userProfileUpdate'));
 
     } catch (err) {
-      console.error('Profile update error:', err);
       setError(err.response?.data?.message || err.message || '프로필 업데이트 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -174,7 +172,7 @@ const Profile = () => {
         
         <Card.Body className="auth-card-body">
           <div className="profile-header mb-4 text-center">
-            <ProfileImageUpload 
+            <ProfileImageUpload
               currentImage={profileImage}
               onImageChange={handleImageChange}
             />
@@ -207,7 +205,7 @@ const Profile = () => {
               />
             </FormGroup>
             
-            <FormGroup>              
+            <FormGroup>
               <Label htmlFor="name">
                 이름
               </Label>
@@ -222,7 +220,7 @@ const Profile = () => {
               />
             </FormGroup>
             
-            <FormGroup>   
+            <FormGroup>
               <Label htmlFor="currentPassword">
                 현재 비밀번호
               </Label>
@@ -237,7 +235,7 @@ const Profile = () => {
               />
             </FormGroup>
             
-            <FormGroup>   
+            <FormGroup>
               <Label htmlFor="newPassword">
                 새 비밀번호
               </Label>
@@ -252,7 +250,7 @@ const Profile = () => {
               />
             </FormGroup>
             
-            <FormGroup>   
+            <FormGroup>
               <Label htmlFor="confirmPassword">
                 새 비밀번호 확인
               </Label>

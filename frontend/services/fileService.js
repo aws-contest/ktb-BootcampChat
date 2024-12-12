@@ -2,6 +2,48 @@ import axios, { isCancel, CancelToken } from 'axios';
 import authService from './authService';
 import { Toast } from '../components/Toast';
 
+const ALLOWED_TYPES = {
+  image: {
+    extensions: ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
+    mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+    maxSize: 10 * 1024 * 1024,
+    name: '이미지',
+  },
+  video: {
+    extensions: ['.mp4', '.webm', '.mov'],
+    mimeTypes: ['video/mp4', 'video/webm', 'video/quicktime'],
+    maxSize: 50 * 1024 * 1024,
+    name: '동영상',
+  },
+  audio: {
+    extensions: ['.mp3', '.wav', '.ogg'],
+    mimeTypes: ['audio/mpeg', 'audio/wav', 'audio/ogg'],
+    maxSize: 20 * 1024 * 1024,
+    name: '오디오',
+  },
+  document: {
+    extensions: ['.pdf', '.doc', '.docx', '.txt'],
+    mimeTypes: [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/plain',
+    ],
+    maxSize: 20 * 1024 * 1024,
+    name: '문서',
+  },
+  archive: {
+    extensions: ['.zip', '.rar', '.7z'],
+    mimeTypes: [
+      'application/zip',
+      'application/x-rar-compressed',
+      'application/x-7z-compressed',
+    ],
+    maxSize: 50 * 1024 * 1024,
+    name: '압축파일',
+  },
+};
+
 class FileService {
   constructor() {
     this.baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -9,48 +51,6 @@ class FileService {
     this.retryAttempts = 3;
     this.retryDelay = 1000;
     this.activeUploads = new Map();
-
-    this.allowedTypes = {
-      image: {
-        extensions: ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
-        mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-        maxSize: 10 * 1024 * 1024,
-        name: '이미지'
-      },
-      video: {
-        extensions: ['.mp4', '.webm', '.mov'],
-        mimeTypes: ['video/mp4', 'video/webm', 'video/quicktime'],
-        maxSize: 50 * 1024 * 1024,
-        name: '동영상'
-      },
-      audio: {
-        extensions: ['.mp3', '.wav', '.ogg'],
-        mimeTypes: ['audio/mpeg', 'audio/wav', 'audio/ogg'],
-        maxSize: 20 * 1024 * 1024,
-        name: '오디오'
-      },
-      document: {
-        extensions: ['.pdf', '.doc', '.docx', '.txt'],
-        mimeTypes: [
-          'application/pdf',
-          'application/msword',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'text/plain'
-        ],
-        maxSize: 20 * 1024 * 1024,
-        name: '문서'
-      },
-      archive: {
-        extensions: ['.zip', '.rar', '.7z'],
-        mimeTypes: [
-          'application/zip',
-          'application/x-rar-compressed',
-          'application/x-7z-compressed'
-        ],
-        maxSize: 50 * 1024 * 1024,
-        name: '압축파일'
-      }
-    };
   }
 
   async validateFile(file) {
@@ -70,7 +70,7 @@ class FileService {
     let maxTypeSize = 0;
     let typeConfig = null;
 
-    for (const config of Object.values(this.allowedTypes)) {
+    for (const config of Object.values(ALLOWED_TYPES)) {
       if (config.mimeTypes.includes(file.type)) {
         isAllowedType = true;
         maxTypeSize = config.maxSize;
@@ -110,9 +110,9 @@ class FileService {
     try {
       const user = authService.getCurrentUser();
       if (!user?.token || !user?.sessionId) {
-        return { 
-          success: false, 
-          message: '인증 정보가 없습니다.' 
+        return {
+          success: false,
+          message: '인증 정보가 없습니다.'
         };
       }
 
@@ -122,8 +122,8 @@ class FileService {
       const source = CancelToken.source();
       this.activeUploads.set(file.name, source);
 
-      const uploadUrl = this.baseUrl ? 
-        `${this.baseUrl}/api/files/upload` : 
+      const uploadUrl = this.baseUrl ?
+        `${this.baseUrl}/api/files/upload` :
         '/api/files/upload';
 
       const response = await axios.post(uploadUrl, formData, {
@@ -196,6 +196,7 @@ class FileService {
       return this.handleUploadError(error);
     }
   }
+  
   async downloadFile(filename, originalname) {
     try {
       const user = authService.getCurrentUser();
@@ -306,7 +307,7 @@ class FileService {
   getFileUrl(filename, forPreview = false) {
     if (!filename) return '';
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    const baseUrl = process.env.NEXT_PUBLIC_FILE_API_URL || '';
     const endpoint = forPreview ? 'view' : 'download';
     return `${baseUrl}/api/files/${endpoint}/${filename}`;
   }
@@ -314,7 +315,7 @@ class FileService {
   getPreviewUrl(file, withAuth = true) {
     if (!file?.filename) return '';
 
-    const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/files/view/${file.filename}`;
+    const baseUrl = `${process.env.NEXT_PUBLIC_FILE_API_URL}/api/files/view/${file.filename}`;
     
     if (!withAuth) return baseUrl;
 
@@ -332,7 +333,7 @@ class FileService {
   getFileType(filename) {
     if (!filename) return 'unknown';
     const ext = this.getFileExtension(filename).toLowerCase();
-    for (const [type, config] of Object.entries(this.allowedTypes)) {
+    for (const [type, config] of Object.entries(ALLOWED_TYPES)) {
       if (config.extensions.includes(ext)) {
         return type;
       }

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { Card } from '@goorm-dev/vapor-core';
-import { 
-  Button, 
-  Input, 
+import {
+  Button,
+  Input,
   Text,
   Alert,
   FormGroup,
@@ -16,6 +16,7 @@ import {
 import { AlertCircle, PartyPopper } from 'lucide-react';
 import ReactCanvasConfetti from 'react-canvas-confetti';
 import authService from '../services/authService';
+import Image from "next/image";
 
 const canvasStyles = {
   position: 'fixed',
@@ -161,7 +162,7 @@ const Register = () => {
       <Card className="auth-card">
         <Card.Body className="auth-card-body">
           <div className="auth-header">
-            <img src="images/logo.png" className="w-50" alt="Logo" />
+            <Image src="/images/logo.png" className="w-50" alt="Logo"/>
             <Text as="h3" typography="heading3">
               회원가입
             </Text>
@@ -313,9 +314,9 @@ const Register = () => {
         </ModalBody>
 
         <ModalFooter>
-          <Button 
-            variant="primary" 
-            size="lg" 
+          <Button
+            variant="primary"
+            size="lg"
             onClick={() => router.push('/chat-rooms')}
             className="w-full"
           >
