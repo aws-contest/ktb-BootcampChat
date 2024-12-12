@@ -69,7 +69,7 @@ export const useChatRoom = () => {
     handleScroll,
     setHasMoreMessages,
     setLoadingMessages
-  } = useScrollHandling(socketRef, router, messages);  
+  } = useScrollHandling(socketRef, router, messages);
   
   // AI Message handling hook
   const {
@@ -184,11 +184,11 @@ export const useChatRoom = () => {
       cleanupInProgressRef.current = false;
     }
   }, [
-    setMessages, 
-    setStreamingMessages, 
-    setError, 
-    setLoading, 
-    setLoadingMessages, 
+    setMessages,
+    setStreamingMessages,
+    setError,
+    setLoading,
+    setLoadingMessages,
     mountedRef,
     socketRef,
     router.query.room
@@ -316,7 +316,6 @@ export const useChatRoom = () => {
         return;
       }
 
-      console.log('Received message:', message);
       processedMessageIds.current.add(message._id);
 
       setMessages(prev => {
@@ -421,7 +420,7 @@ export const useChatRoom = () => {
       setConnectionStatus('connected');
       setConnected(true);
       
-      if (router.query.room && !setupCompleteRef.current && 
+      if (router.query.room && !setupCompleteRef.current &&
           !initializingRef.current && !isInitialized) {
         socketInitializedRef.current = true;
         setupRoom().catch(error => {

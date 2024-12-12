@@ -20,7 +20,7 @@ const RETRY_CONFIG = {
 
 // 기본 설정으로 axios 인스턴스 생성
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL || 'http://localhost:5000',
+  baseURL: API_BASE_URL || 'http://localhost:5001',
   timeout: 30000,
   withCredentials: true,
   headers: {
@@ -29,10 +29,10 @@ const axiosInstance = axios.create({
   }
 });
 
-// 재시도 딜레이 계산 함수 
+// 재시도 딜레이 계산 함수
 const getRetryDelay = (retryCount) => {
   // 지수 백오프와 약간의 무작위성 추가
-  const delay = RETRY_CONFIG.initialDelayMs * 
+  const delay = RETRY_CONFIG.initialDelayMs *
     Math.pow(RETRY_CONFIG.backoffFactor, retryCount) *
     (1 + Math.random() * 0.1); // 지터 추가
   return Math.min(delay, RETRY_CONFIG.maxDelayMs);
@@ -56,7 +56,6 @@ const isRetryableError = (error) => {
   if (!error.response && error.request) {
     return true;
   }
-  
   return false;
 };
 
@@ -104,10 +103,8 @@ axiosInstance.interceptors.request.use(
 // 응답 인터셉터
 axiosInstance.interceptors.response.use(
   (response) => {
-    // 성공한 요청 제거
     const requestKey = `${response.config.method}:${response.config.url}`;
     pendingRequests.delete(requestKey);
-    
     return response;
   },
   async (error) => {
@@ -127,12 +124,11 @@ axiosInstance.interceptors.response.use(
       
       console.log(
         `Retrying request (${config.retryCount}/${RETRY_CONFIG.maxRetries}) ` +
-        `after ${Math.round(delay)}ms:`, 
+        `after ${Math.round(delay)}ms:`,
         config.url
       );
       
       try {
-        // 딜레이 후 재시도
         await new Promise(resolve => setTimeout(resolve, delay));
         return await axiosInstance(config);
       } catch (retryError) {
@@ -145,7 +141,6 @@ axiosInstance.interceptors.response.use(
 
     // 에러 유형별 처리
     if (!error.response) {
-      // 네트워크 오류
       const customError = new Error();
       customError.message = [
         '서버와 통신할 수 없습니다.',
@@ -234,12 +229,10 @@ axiosInstance.interceptors.response.use(
       }
     };
 
-    // 401 에러 처리
     if (status === 401) {
       try {
         const refreshed = await authService.refreshToken();
         if (refreshed) {
-          // 토큰 갱신 성공 시 원래 요청 재시도
           const user = authService.getCurrentUser();
           if (user?.token) {
             config.headers['x-auth-token'] = user.token;
@@ -254,10 +247,8 @@ axiosInstance.interceptors.response.use(
         }
       }
     }
-
     throw enhancedError;
   }
 );
 
-// 인스턴스 내보내기
 export default axiosInstance;

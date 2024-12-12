@@ -103,8 +103,6 @@ export const useMessageHandling = (socketRef, currentUser, router, handleSession
    }
 
    try {
-     console.log('[Chat] Sending message:', messageData);
-
      if (messageData.type === 'file') {
        setUploading(true);
        setUploadError(null);
@@ -153,8 +151,8 @@ export const useMessageHandling = (socketRef, currentUser, router, handleSession
    } catch (error) {
      console.error('[Chat] Message submit error:', error);
 
-     if (error.message?.includes('세션') || 
-         error.message?.includes('인증') || 
+     if (error.message?.includes('세션') ||
+         error.message?.includes('인증') ||
          error.message?.includes('토큰')) {
        await handleSessionError();
        return;
@@ -191,7 +189,7 @@ export const useMessageHandling = (socketRef, currentUser, router, handleSession
      ...room.participants
    ];
 
-   return allParticipants.filter(user => 
+   return allParticipants.filter(user =>
      user.name.toLowerCase().includes(mentionFilter) ||
      user.email.toLowerCase().includes(mentionFilter)
    );
@@ -206,7 +204,7 @@ export const useMessageHandling = (socketRef, currentUser, router, handleSession
 
    if (atSymbolIndex !== -1) {
      const textBeforeAt = message.slice(0, atSymbolIndex);
-     const newMessage = 
+     const newMessage =
        textBeforeAt +
        `@${user.name} ` +
        message.slice(cursorPosition);

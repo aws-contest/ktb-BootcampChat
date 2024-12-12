@@ -1,7 +1,4 @@
 import { io } from 'socket.io-client';
-import { Modal, Alert, Button } from '@goorm-dev/vapor-components';
-import { AlertCircle, Timer, ExternalLink, AlertTriangle } from 'lucide-react';
-import { Toast } from '../components/Toast';
 import authService from './authService';
 
 const CLEANUP_REASONS = {
@@ -270,8 +267,8 @@ class SocketService {
     }
     
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('socketError', { 
-        detail: { error } 
+      window.dispatchEvent(new CustomEvent('socketError', {
+        detail: { error }
       }));
     }
   }

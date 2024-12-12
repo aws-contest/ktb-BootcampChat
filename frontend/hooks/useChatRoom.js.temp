@@ -45,27 +45,27 @@ export const useChatRoom = () => {
 
   // 리액션 상태 관리를 위한 핸들러
   const handleReactionUpdate = useCallback(({ messageId, reactions }) => {
-    setMessages(prev => prev.map(msg => 
+    setMessages(prev => prev.map(msg =>
       msg._id === messageId ? { ...msg, reactions } : msg
     ));
   }, []);
 
   const scrollToBottom = useCallback((behavior = 'smooth') => {
     if (!messagesEndRef.current) return;
-    
+
     const messageList = messagesEndRef.current;
     const scrollHeight = messageList.scrollHeight;
     const height = messageList.clientHeight;
     const maxScrollTop = scrollHeight - height;
-    
+
     if (isNearBottom || behavior === 'auto') {
       requestAnimationFrame(() => {
         messageList.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
       });
     }
   }, [isNearBottom]);
-  
-  const handleLoadMore = useCallback(async () => {  
+
+  const handleLoadMore = useCallback(async () => {
     if (!hasMoreMessages || loadingMessages || isLoadingRef.current) {
       console.log('Load more blocked:', {
         hasMoreMessages,
@@ -99,7 +99,7 @@ export const useChatRoom = () => {
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
-      
+
       loadingTimeoutRef.current = setTimeout(() => {
         isLoadingRef.current = false;
         setLoadingMessages(false);
@@ -155,7 +155,7 @@ export const useChatRoom = () => {
 
       const { scrollTop, scrollHeight, clientHeight } = container;
       const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-      
+
       // 스크롤 위치가 상단에 가까워지면 추가 메시지 로드
       if (scrollTop < 50) {
         console.log('Reached scroll threshold, attempting to load more messages');
@@ -200,7 +200,7 @@ export const useChatRoom = () => {
     };
 
     messageList.addEventListener('scroll', scrollListener, { passive: true });
-    
+
     return () => {
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
@@ -234,7 +234,7 @@ export const useChatRoom = () => {
     } catch (refreshError) {
       console.error('Token refresh failed:', refreshError);
     }
-    
+
     authService.logout();
     router.replace('/?redirect=' + router.asPath);
     return false;
@@ -271,7 +271,7 @@ export const useChatRoom = () => {
       Toast.error('리액션 제거에 실패했습니다.');
     }
   }, []);
-  
+
   const fetchRoomData = async (roomId) => {
     if (!roomId || !currentUser?.token) {
       router.replace('/?redirect=' + router.asPath);
@@ -292,15 +292,15 @@ export const useChatRoom = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        
-        if (response.status === 401 || 
-            errorData.message?.includes('세션') || 
-            errorData.message?.includes('인증') || 
+
+        if (response.status === 401 ||
+            errorData.message?.includes('세션') ||
+            errorData.message?.includes('인증') ||
             errorData.message?.includes('토큰')) {
           await handleSessionError();
           return;
         }
-        
+
         Toast.error(errorData.message || '채팅방 정보를 불러오는데 실패했습니다.');
         setLoading(false);
         return;
@@ -312,24 +312,24 @@ export const useChatRoom = () => {
 
     } catch (error) {
       console.error('Room fetch error:', error);
-      
+
       if (!navigator.onLine) {
         Toast.error('인터넷 연결을 확인해주세요.');
       } else {
         Toast.error('채팅방 정보를 불러오는데 실패했습니다.');
       }
-      
+
       setLoading(false);
     }
   };
 
   const handlePreviousMessagesLoaded = useCallback(({ messages: newMessages, hasMore, oldestTimestamp }) => {
     console.log("handlePreviousMessagesLoaded 0");
-    
+
     if (!newMessages?.length) return;
 
     console.log("handlePreviousMessagesLoaded 1");
-    
+
     setMessages(prev => {
       // 중복 메시지 제거를 위해 Map 사용
       const messageMap = new Map(prev.map(msg => [msg._id, msg]));
@@ -352,7 +352,7 @@ export const useChatRoom = () => {
     });
 
     console.log("handlePreviousMessagesLoaded 2");
-    
+
     setHasMoreMessages(hasMore);
     setLoadingMessages(false);
 
@@ -366,9 +366,9 @@ export const useChatRoom = () => {
   const handleSocketMessage = useCallback((newMessage) => {
     if (newMessage.type !== 'ai') {
       setMessages(prev => {
-        const isDuplicate = prev.some(msg => 
-          msg._id === newMessage._id || 
-          (msg.timestamp === newMessage.timestamp && 
+        const isDuplicate = prev.some(msg =>
+          msg._id === newMessage._id ||
+          (msg.timestamp === newMessage.timestamp &&
            msg.content === newMessage.content)
         );
         if (isDuplicate) return prev;
@@ -433,7 +433,7 @@ export const useChatRoom = () => {
         }
       };
     });
-    
+
     if (isNearBottom) {
       scrollToBottom();
     }
@@ -460,7 +460,7 @@ export const useChatRoom = () => {
         reactions: {}
       }];
     });
-    
+
     scrollToBottom();
   }, [scrollToBottom]);
 
@@ -495,7 +495,7 @@ export const useChatRoom = () => {
 
         const setupEventListeners = () => {
           socket.removeAllListeners();
-          
+
           socket.on('message', handleSocketMessage);
           socket.on('previousMessages', handleInitialMessages);
           socket.on('previousMessagesLoaded', handlePreviousMessagesLoaded);
@@ -514,7 +514,7 @@ export const useChatRoom = () => {
             setConnected(false);
             setHasMoreMessages(true);
           });
-          
+
           socket.on('unauthorized', handleSessionError);
           socket.on('session_expired', handleSessionError);
         };
@@ -586,7 +586,7 @@ export const useChatRoom = () => {
         return;
       }
     }
-    
+
     setShowMentionList(false);
   }, []);
 
@@ -598,8 +598,6 @@ export const useChatRoom = () => {
     }
 
     try {
-      console.log('[Chat] Sending message:', messageData);
-
       if (messageData.type === 'file') {
         setUploading(true);
         setUploadError(null);
@@ -649,8 +647,8 @@ export const useChatRoom = () => {
     } catch (error) {
       console.error('[Chat] Message submit error:', error);
 
-      if (error.message?.includes('세션') || 
-          error.message?.includes('인증') || 
+      if (error.message?.includes('세션') ||
+          error.message?.includes('인증') ||
           error.message?.includes('토큰')) {
         await handleSessionError();
         return;
@@ -692,7 +690,7 @@ export const useChatRoom = () => {
       ...room.participants
     ];
 
-    return allParticipants.filter(user => 
+    return allParticipants.filter(user =>
       user.name.toLowerCase().includes(mentionFilter) ||
       user.email.toLowerCase().includes(mentionFilter)
     );
@@ -707,7 +705,7 @@ export const useChatRoom = () => {
 
     if (atSymbolIndex !== -1) {
       const textBeforeAt = message.slice(0, atSymbolIndex);
-      const newMessage = 
+      const newMessage =
         textBeforeAt +
         `@${user.name} ` +
         message.slice(cursorPosition);
@@ -729,13 +727,13 @@ export const useChatRoom = () => {
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setMentionIndex(prev => 
+          setMentionIndex(prev =>
             prev < filteredParticipants.length - 1 ? prev + 1 : 0
           );
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setMentionIndex(prev => 
+          setMentionIndex(prev =>
             prev > 0 ? prev - 1 : filteredParticipants.length - 1
           );
           break;
@@ -773,18 +771,18 @@ export const useChatRoom = () => {
   const handleConnectionError = useCallback(async (error) => {
     console.error('Connection error:', error);
     setConnected(false);
-    
-    if (error?.message?.includes('세션') || 
-        error?.message?.includes('인증') || 
+
+    if (error?.message?.includes('세션') ||
+        error?.message?.includes('인증') ||
         error?.message?.includes('토큰')) {
       await handleSessionError();
       return;
     }
-    
+
     if (retryCount < maxRetries) {
       const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 5000);
       console.log(`Retrying connection in ${retryDelay}ms...`);
-      
+
       setTimeout(async () => {
         try {
           if (socketRef.current) {
@@ -804,7 +802,7 @@ export const useChatRoom = () => {
     try {
       setError(null);
       setRetryCount(0);
-      
+
       if (socketRef.current) {
         console.log("disconnect???");
         socketRef.current.disconnect();
@@ -821,14 +819,14 @@ export const useChatRoom = () => {
       socket.emit('joinRoom', router.query.room);
     } catch (error) {
       console.error('Reconnection failed:', error);
-      
-      if (error.message?.includes('세션') || 
-          error.message?.includes('인증') || 
+
+      if (error.message?.includes('세션') ||
+          error.message?.includes('인증') ||
           error.message?.includes('토큰')) {
         await handleSessionError();
         return;
       }
-      
+
       Toast.error('재연결에 실패했습니다.');
     }
   }, [currentUser, router.query.room, handleSessionError]);
@@ -870,7 +868,7 @@ export const useChatRoom = () => {
       setLoadingMessages(false);
     };
   }, []);
-  
+
   return {
     room,
     messages,

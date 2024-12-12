@@ -72,19 +72,8 @@ const TableWrapper = ({ children, onScroll, loadingMore, hasMore, rooms }) => {
       const { scrollHeight, scrollTop, clientHeight } = container;
       const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
 
-      console.log('Scroll check:', {
-        scrollHeight,
-        scrollTop,
-        clientHeight,
-        distanceToBottom,
-        loadingMore,
-        hasMore,
-        timeSinceLastCheck: now - lastScrollTime.current
-      });
-
       if (distanceToBottom < SCROLL_THRESHOLD && !loadingMore && hasMore) {
-        console.log('Triggering load more...');
-        lastScrollTime.current = now; // 마지막 체크 시간 업데이트
+        lastScrollTime.current = now;
         onScroll();
         return;
       }
@@ -95,16 +84,7 @@ const TableWrapper = ({ children, onScroll, loadingMore, hasMore, rooms }) => {
       scrollTimeoutRef.current = setTimeout(() => {
         const { scrollHeight, scrollTop, clientHeight } = container;
         const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
-
-        console.log('Debounced scroll check:', {
-          scrollHeight,
-          scrollTop,
-          clientHeight,
-          distanceToBottom,
-          loadingMore,
-          hasMore
-        });
-
+        
         if (distanceToBottom < SCROLL_THRESHOLD && !loadingMore && hasMore) {
           console.log('Triggering load more (debounced)...');
           onScroll();

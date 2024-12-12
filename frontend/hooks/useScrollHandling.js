@@ -71,7 +71,7 @@ export const useScrollHandling = (socketRef, router, messages = []) => {
     });
   }, [isLoadingPreviousMessages, logDebug]);
 
-  const tryLoadMoreMessages = useCallback(async () => {  
+  const tryLoadMoreMessages = useCallback(async () => {
     if (!hasMoreMessages || loadingMessages || isLoadingRef.current || loadMoreTriggeredRef.current) {
       logDebug('loadMore prevented', {
         hasMoreMessages,
@@ -154,8 +154,6 @@ export const useScrollHandling = (socketRef, router, messages = []) => {
   ]);
 
   const handleScroll = useCallback(() => {
-    console.log('Scroll event triggered'); // 스크롤 이벤트 확인용 로그
-
     if (!messagesEndRef.current) {
       console.log('No messagesEndRef');
       return;
@@ -177,27 +175,11 @@ export const useScrollHandling = (socketRef, router, messages = []) => {
       const { scrollTop, scrollHeight, clientHeight } = container;
       const isAtBottom = scrollHeight - (scrollTop + clientHeight) < 100;
       const isAtTop = scrollTop < 30;
-
-      console.log('Scroll position:', { // 스크롤 위치 확인
-        scrollTop,
-        scrollHeight,
-        clientHeight,
-        isAtTop,
-        isAtBottom
-      });
-
+      
       setIsNearBottom(isAtBottom);
 
       if (isAtTop) {
-        console.log('Is at top, checking conditions:', { // 조건 확인
-          hasMoreMessages,
-          loadingMessages,
-          isLoading: isLoadingRef.current,
-          loadMoreTriggered: loadMoreTriggeredRef.current
-        });
-
         if (hasMoreMessages && !loadingMessages && !isLoadingRef.current && !loadMoreTriggeredRef.current) {
-          console.log('Calling tryLoadMoreMessages'); // 함수 호출 확인
           tryLoadMoreMessages();
         }
       }
